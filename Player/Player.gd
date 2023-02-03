@@ -1,22 +1,38 @@
-extends KinematicBody2D
+extends RigidBody2D
 
+export var speed = 50.0
+export var jump_force = 100.0
 
-var speed = 250
-var velocity = Vector2()
-
-func get_input():
-	# Detect up/down/left/right keystate and only move when pressed.
-	velocity = Vector2()
-	if Input.is_action_pressed('ui_right') or Input.is_action_pressed("move_right"):
-		velocity.x += 1
-	if Input.is_action_pressed('ui_left') or Input.is_action_pressed('move_left'):
-		velocity.x -= 1
-	if Input.is_action_pressed('ui_down'):
-		velocity.y += 1
-	if Input.is_action_pressed('ui_up'):
-		velocity.y -= 1
-	velocity = velocity.normalized() * speed
+var touch_ground = true
 
 func _physics_process(delta):
-	get_input()
-	move_and_collide(velocity * delta)
+	move()
+
+func move():
+	var my_vert_vel = get_linear_velocity().y
+	
+	if Input.is_key_pressed(KEY_D):
+		set_linear_velocity(Vector2(1 * speed, my_vert_vel))
+	elif Input.is_key_pressed(KEY_A):
+		set_linear_velocity(Vector2(-1 * speed, my_vert_vel))
+	else: 
+		set_linear_velocity(Vector2(0, my_vert_vel))
+	
+	if Input.is_key_pressed(KEY_W):
+		if touch_ground == true:
+			apply_impulse(Vector2(), Vector2(0, -1 * jump_force))
+			
+
+
+
+
+func _on_Area2D_body_entered(touched):
+	if touched.get_name() == "TileMap":
+		touch_ground == true
+	
+
+
+
+func _on_Area2D_body_exited(touched):
+	if touched.get_name() == "TileMap":
+		touch_ground == false

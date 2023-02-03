@@ -1,27 +1,44 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://TestLevel/TestLevelMap.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Player/Player.gd" type="Script" id=2]
 [ext_resource path="res://Player/Zombie.png" type="Texture" id=3]
+[ext_resource path="res://Gun/Gun.tscn" type="PackedScene" id=4]
 
-[sub_resource type="CapsuleShape2D" id=1]
-radius = 14.0
+[sub_resource type="PhysicsMaterial" id=2]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 12.5, 21.5 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 12.5, 21.5 )
 
 [node name="Game" type="Node"]
 
 [node name="TileMap" parent="." instance=ExtResource( 1 )]
+position = Vector2( 3, 16 )
 
-[node name="Player" type="KinematicBody2D" parent="."]
-position = Vector2( 309, 487 )
+[node name="Gun" parent="." instance=ExtResource( 4 )]
+
+[node name="Player" type="RigidBody2D" parent="."]
+position = Vector2( 385, 502 )
+mode = 2
+physics_material_override = SubResource( 2 )
 script = ExtResource( 2 )
-__meta__ = {
-"_edit_group_": true
-}
+jump_force = 25.0
 
 [node name="Sprite" type="Sprite" parent="Player"]
-position = Vector2( 1, 1 )
 texture = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
-position = Vector2( -2, 1 )
+position = Vector2( -2.5, 1.5 )
 shape = SubResource( 1 )
+
+[node name="Area2D" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Area2D"]
+position = Vector2( -2.5, 1.5 )
+shape = SubResource( 3 )
+
+[connection signal="body_entered" from="Player/Area2D" to="Player" method="_on_Area2D_body_entered"]
+[connection signal="body_exited" from="Player/Area2D" to="Player" method="_on_Area2D_body_exited"]
